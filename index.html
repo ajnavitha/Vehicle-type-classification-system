@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vehicle Classifier</title>
+</head>
+<body style="text-align:center; font-family:Arial; background:#222; color:white;">
+
+<h1>🚗 Vehicle Classification</h1>
+
+<input type="file" id="fileInput"><br><br>
+<button onclick="predict()">Predict</button>
+<style>
+    body {
+        font-family: Arial;
+        background: #1e1e2f;
+        color: white;
+        text-align: center;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;   /* ✅ center everything */
+        justify-content: center;
+    }
+
+    img {
+        margin-top: 20px;
+        width: 250px;
+        border-radius: 10px;
+        display: none;
+    }
+</style>
+
+<div class="container">
+<br><br>
+<img id="preview" width="250" style="display:none;"><br>
+
+<h2 id="result">Prediction: -</h2>
+
+<script>
+async function predict() {
+    const file = document.getElementById("fileInput").files[0];
+
+    if (!file) {
+        alert("Select image!");
+        return;
+    }
+
+    const preview = document.getElementById("preview");
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+        const res = await fetch("/predict", {   // ✅ IMPORTANT (no full URL)
+            method: "POST",
+            body: formData
+        });
+
+        const data = await res.json();
+
+        document.getElementById("result").innerText =
+            "Prediction: " + (data.prediction || data.error);
+
+    } catch (err) {
+        document.getElementById("result").innerText =
+            "❌ Backend error!";
+    }
+}
+</script>
+
+</body>
+</html>
